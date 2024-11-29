@@ -132,5 +132,5 @@ function createSpringBootRequestClient(baseURL: string) {
 export const baseRequestClient = new RequestClient({ baseURL: apiURL });
 
 export const springBootRequestClient = createSpringBootRequestClient(
-  'http://localhost:9090/',
+  'http://49.234.181.38:9090',
 );

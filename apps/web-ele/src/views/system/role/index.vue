@@ -184,9 +184,6 @@ let editId = 0;
 
 const formData = reactive<RoleState>({
   name: '',
-  roleKey: '',
-  roleSort: 0,
-  status: '1',
   description: '',
 });
 
@@ -208,9 +205,6 @@ const handleAdd = () => {
   dialogTitle.value = '新增角色';
   // 重置表单
   formData.name = '';
-  formData.roleKey = '';
-  formData.roleSort = 0;
-  formData.status = '1';
   formData.description = '';
 };
 
@@ -243,9 +237,6 @@ const handleEdit = (row: any) => {
   editId = row.id;
   dialogVisible.value = true;
   formData.name = row.name;
-  formData.roleKey = row.roleKey;
-  formData.roleSort = row.roleSort;
-  formData.status = row.status;
   formData.description = row.description;
   // TODO: 实现编辑角色逻辑
 };

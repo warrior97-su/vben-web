@@ -18,3 +18,16 @@ interface UserInfo extends BasicUserInfo {
 }
 
 export type { UserInfo };
+
+export interface UserState {
+  id?: number;
+  username: string;
+  password?: string;
+  nickName?: string;
+  email?: string;
+  phone?: string;
+  status?: number;
+  createTime?: string;
+  updateTime?: string;
+  role: number
+}

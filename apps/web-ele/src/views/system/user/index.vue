@@ -3,17 +3,9 @@
     <ElCard class="mb-4">
       <ElForm :inline="true" :model="queryParams" class="flex flex-wrap gap-4">
         <ElFormItem label="用户名">
-          <ElInput v-model="queryParams.username" placeholder="请输入用户名" />
+          <ElInput v-model="queryParams.search" placeholder="请输入用户名" />
         </ElFormItem>
-        <ElFormItem label="手机号">
-          <ElInput v-model="queryParams.phone" placeholder="请输入手机号" />
-        </ElFormItem>
-        <ElFormItem label="状态">
-          <ElSelect v-model="queryParams.status" placeholder="请选择状态">
-            <ElOption label="启用" value="1" />
-            <ElOption label="禁用" value="0" />
-          </ElSelect>
-        </ElFormItem>
+        
         <ElFormItem>
           <ElButton type="primary" @click="handleQuery">查询</ElButton>
           <ElButton @click="resetQuery">重置</ElButton>
@@ -30,24 +22,14 @@
       </template>
 
       <ElTable :data="userList" border style="width: 100%">
-        <ElTableColumn prop="username" label="用户名" />
-        <ElTableColumn prop="nickname" label="昵称" />
+        <ElTableColumn prop="username" label="账号" />
+        <ElTableColumn prop="nickName" label="昵称" />
         <ElTableColumn prop="phone" label="手机号" />
-        <ElTableColumn prop="email" label="邮箱" />
-        <ElTableColumn prop="status" label="状态">
-          <!-- <template #default="{ row }">
-            <ElTag :type="row.status === '1' ? 'success' : 'danger'">
-              {{ row.status === '1' ? '启用' : '禁用' }}
-            </ElTag>
-          </template> -->
-        </ElTableColumn>
-        <ElTableColumn prop="createTime" label="创建时间" />
         <ElTableColumn label="操作" width="200">
-          <!-- <template #default="{ row }">
+          <template #default="{ row }">
             <ElButton type="primary" link @click="handleEdit(row)">编辑</ElButton>
-            <ElButton type="primary" link @click="handleAssignRole(row)">分配角色</ElButton>
             <ElButton type="danger" link @click="handleDelete(row)">删除</ElButton>
-          </template> -->
+          </template>
         </ElTableColumn>
       </ElTable>
 
@@ -64,92 +46,153 @@
       </div>
     </ElCard>
 
-
     <ElDialog
-  v-model="dialogVisible"
-  title="新建用户"
-  width="500px"
->
-  <ElForm
-    ref="formRef"
-    :model="formData"
-    label-width="80px"
-  >
-    <ElFormItem label="用户名" prop="username">
-      <ElInput v-model="formData.username" placeholder="请输入用户名" />
-    </ElFormItem>
-    <ElFormItem label="密码" prop="password">
-      <ElInput
-        v-model="formData.password"
-        type="password"
-        placeholder="请输入密码"
-        show-password
-      />
-    </ElFormItem>
-  </ElForm>
-  <template #footer>
-    <span class="dialog-footer">
-      <ElButton @click="dialogVisible = false">取消</ElButton>
-      <ElButton type="primary" @click="handleSubmit">确定</ElButton>
-    </span>
-  </template>
-</ElDialog>
-
-    
+      v-model="dialogVisible"
+      :title="dialogTitle"
+      width="500px"
+    >
+      <ElForm
+        ref="formRef"
+        :model="formData"
+        :rules="formRules"
+        label-width="80px"
+      >
+        <ElFormItem label="账号" prop="username">
+          <ElInput v-model="formData.username" placeholder="请输入用户名" />
+        </ElFormItem>
+        <ElFormItem label="密码" prop="password" v-if="!editId">
+          <ElInput
+            v-model="formData.password"
+            type="password"
+            placeholder="请输入密码"
+            show-password
+          />
+        </ElFormItem>
+        <ElFormItem label="昵称" prop="nickName">
+          <ElInput v-model="formData.nickName" placeholder="请输入昵称" />
+        </ElFormItem>
+        <ElFormItem label="手机号" prop="phone">
+          <ElInput v-model="formData.phone" placeholder="请输入手机号" />
+        </ElFormItem>
+      </ElForm>
+      <template #footer>
+        <span class="dialog-footer">
+          <ElButton @click="dialogVisible = false">取消</ElButton>
+          <ElButton type="primary" @click="handleSubmit">确定</ElButton>
+        </span>
+      </template>
+    </ElDialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ElDialog, ElCard, ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElButton, ElTable, ElTableColumn, ElPagination } from 'element-plus';
-import { ref, reactive } from 'vue';
-import { createUserApi } from '#/api/core/user';
+import { ElDialog, ElCard, ElForm, ElFormItem, ElInput, ElButton, ElTable, ElTableColumn, ElPagination, ElMessage, ElMessageBox } from 'element-plus';
+import { ref, reactive, onMounted } from 'vue';
+import type { FormInstance } from 'element-plus';
+import type { UserState } from '@vben/types';
+import { createUserApi, updateUserApi, deleteUserApi, getUserListApi } from '#/api/core/user';
+import type {  } from 'element-plus';
 
 interface QueryParams {
-  username: string;
-  phone: string;
-  status: string;
+  search: string;
   pageNum: number;
   pageSize: number;
 }
 
 const queryParams = reactive<QueryParams>({
-  username: '',
-  phone: '',
-  status: '',
+  search: '',
   pageNum: 1,
   pageSize: 10,
 });
 
 const total = ref(0);
-const userList = ref([]);
+const userList = ref<UserState[]>([]);
+const dialogVisible = ref(false);
+const dialogTitle = ref('新增用户');
+const formRef = ref<FormInstance>();
+let editId = 0;
 
-const handleQuery = () => {
-  // TODO: 实现查询逻辑
+const formData = reactive<UserState>({
+  username: '',
+  password: '',
+  nickName: '',
+  email: '',
+  phone: '',
+  id: 0,
+  role: 0,
+});
+
+const formRules = {
+  username: [
+    { required: true, message: '请输入用户名', trigger: 'blur' },
+    { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
+  ],
+  password: [
+    { required: true, message: '请输入密码', trigger: 'blur' },
+    { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' }
+  ],
+  phone: [
+    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
+  ],
+  email: [
+    { pattern: /^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$/, message: '请输入正确的邮箱地址', trigger: 'blur' }
+  ]
+};
+
+const handleQuery = async () => {
+  try {
+    const res = await getUserListApi({
+      search: queryParams.search,
+      pageNum: queryParams.pageNum,
+      pageSize: queryParams.pageSize
+    });
+    userList.value = res.records;
+    total.value = res.total;
+  } catch (error) {
+    console.error('获取用户列表失败:', error);
+    ElMessage.error('获取用户列表失败');
+  }
 };
 
 const resetQuery = () => {
-  queryParams.username = '';
-  queryParams.phone = '';
-  queryParams.status = '';
+  queryParams.search = '';
+  queryParams.pageNum = 1;
   handleQuery();
 };
 
 const handleAdd = () => {
+  editId = 0;
   dialogVisible.value = true;
+  dialogTitle.value = '新增用户';
   formData.username = '';
   formData.password = '';
+  formData.nickName = '';
+  formData.email = '';
+  formData.phone = '';
 };
 
-const handleEdit = (row: any) => {
-  // TODO: 实现编辑用户逻辑
+const handleEdit = (row: UserState) => {
+  editId = row.id!;
+  dialogVisible.value = true;
+  dialogTitle.value = '编辑用户';
+  formData.username = row.username;
+  formData.nickName = row.nickName || '';
+  formData.email = row.email || '';
+  formData.phone = row.phone || '';
 };
 
-const handleAssignRole = (row: any) => {
-  // TODO: 实现分配角色逻辑
-};
-
-const handleDelete = (row: any) => {
-  // TODO: 实现删除用户逻辑
+const handleDelete = async (row: UserState) => {
+  try {
+    await ElMessageBox.confirm('确认要删除该用户吗？', '提示', {
+      type: 'warning'
+    });
+    await deleteUserApi(row.id!);
+    ElMessage.success('删除成功');
+    handleQuery();
+  } catch (error) {
+    console.error('删除用户失败:', error);
+    ElMessage.error('删除用户失败');
+  }
 };
 
 const handleSizeChange = (val: number) => {
@@ -162,24 +205,29 @@ const handleCurrentChange = (val: number) => {
   handleQuery();
 };
 
-const dialogVisible = ref(false);
-const formData = reactive({
-  username: '',
-  password: ''
-});
-const formRef = ref();
-
-
 const handleSubmit = async () => {
-  // TODO: Add your API call here to create the user
-  // const res = await createUser(formData);
-  dialogVisible.value = false;
-
-  const res = await createUserApi(formData);
-
-  console.log(res);
+  if (!formRef.value) return;
   
-  // Refresh the user list after successful creation
-  handleQuery();
+  try {
+    await formRef.value.validate();
+    
+    if (editId) {
+      await updateUserApi({ ...formData, id: editId });
+      ElMessage.success('修改成功');
+    } else {
+      await createUserApi(formData);
+      ElMessage.success('创建成功');
+    }
+    
+    dialogVisible.value = false;
+    handleQuery();
+  } catch (error) {
+    console.error('提交失败:', error);
+    ElMessage.error('提交失败');
+  }
 };
+
+onMounted(() => {
+  handleQuery();
+});
 </script>

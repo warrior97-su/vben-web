@@ -180,6 +180,7 @@ onMounted(() => {
             v-model="menuForm.pid"
             :data="menuOptions"
             :props="{ label: 'name', value: 'id' }"
+            check-strictly
             clearable
             placeholder="选择上级菜单"
           />

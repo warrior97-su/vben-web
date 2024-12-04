@@ -1,8 +1,10 @@
 import type { RouteRecordRaw } from 'vue-router';
+
 import { BasicLayout } from '#/layouts';
+
 const system: RouteRecordRaw[] = [
   {
-    name: 'System',
+    name: '系统管理',
     path: '/system',
     component: BasicLayout,
     meta: {

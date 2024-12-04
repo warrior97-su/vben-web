@@ -12,6 +12,7 @@ import { $t, setupI18n } from '#/locales';
 
 import { initComponentAdapter } from './adapter/component';
 import App from './app.vue';
+import styleImport from './element-plus-directive';
 import { router } from './router';
 
 async function bootstrap(namespace: string) {
@@ -29,6 +30,7 @@ async function bootstrap(namespace: string) {
   registerAccessDirective(app);
 
   // 配置路由及路由守卫
+  app.use(styleImport);
   app.use(router);
 
   // 动态更新标题

@@ -1,23 +1,20 @@
 import { defineConfig } from '@vben/vite-config';
 
-import Components from 'unplugin-vue-components/vite';
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
-
+import Components from 'unplugin-vue-components/vite';
 
 export default defineConfig(async () => {
   return {
     application: {},
     vite: {
       plugins: [
-        // ElementPlus({
-        //   format: 'esm',
-        //   useSource: true,
-        // }),
         Components({
           dirs: ['src/components'],
-          resolvers: [ElementPlusResolver({
-            importStyle: 'sass',
-          })],
+          resolvers: [
+            ElementPlusResolver({
+              importStyle: 'sass',
+            }),
+          ],
         }),
       ],
       server: {
@@ -30,9 +27,9 @@ export default defineConfig(async () => {
             ws: true,
           },
           '/local': {
-            target: 'http://localhost:9090',
             changeOrigin: true,
             rewrite: (path: string) => path.replace(/^\/local/, ''),
+            target: 'http://localhost:9090',
           },
         },
       },

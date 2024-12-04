@@ -1,97 +1,17 @@
-<template>
-  <div class="p-4">
-    <ElCard class="mb-4">
-      <ElForm :inline="true" :model="queryParams" class="flex flex-wrap gap-4">
-        <ElFormItem label="用户名">
-          <ElInput v-model="queryParams.search" placeholder="请输入用户名" />
-        </ElFormItem>
-        
-        <ElFormItem>
-          <ElButton type="primary" @click="handleQuery">查询</ElButton>
-          <ElButton @click="resetQuery">重置</ElButton>
-        </ElFormItem>
-      </ElForm>
-    </ElCard>
-
-    <ElCard>
-      <template #header>
-        <div class="flex justify-between items-center">
-          <span>用户列表</span>
-          <ElButton type="primary" @click="handleAdd">新增用户</ElButton>
-        </div>
-      </template>
-
-      <ElTable :data="userList" border style="width: 100%">
-        <ElTableColumn prop="username" label="账号" />
-        <ElTableColumn prop="nickName" label="昵称" />
-        <ElTableColumn prop="phone" label="手机号" />
-        <ElTableColumn label="操作" width="200">
-          <template #default="{ row }">
-            <ElButton type="primary" link @click="handleEdit(row)">编辑</ElButton>
-            <ElButton type="danger" link @click="handleDelete(row)">删除</ElButton>
-          </template>
-        </ElTableColumn>
-      </ElTable>
-
-      <div class="flex justify-end mt-4">
-        <ElPagination
-          v-model:current-page="queryParams.pageNum"
-          v-model:page-size="queryParams.pageSize"
-          :total="total"
-          :page-sizes="[10, 20, 30, 50]"
-          layout="total, sizes, prev, pager, next"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
-    </ElCard>
-
-    <ElDialog
-      v-model="dialogVisible"
-      :title="dialogTitle"
-      width="500px"
-    >
-      <ElForm
-        ref="formRef"
-        :model="formData"
-        :rules="formRules"
-        label-width="80px"
-      >
-        <ElFormItem label="账号" prop="username">
-          <ElInput v-model="formData.username" placeholder="请输入用户名" />
-        </ElFormItem>
-        <ElFormItem label="密码" prop="password" v-if="!editId">
-          <ElInput
-            v-model="formData.password"
-            type="password"
-            placeholder="请输入密码"
-            show-password
-          />
-        </ElFormItem>
-        <ElFormItem label="昵称" prop="nickName">
-          <ElInput v-model="formData.nickName" placeholder="请输入昵称" />
-        </ElFormItem>
-        <ElFormItem label="手机号" prop="phone">
-          <ElInput v-model="formData.phone" placeholder="请输入手机号" />
-        </ElFormItem>
-      </ElForm>
-      <template #footer>
-        <span class="dialog-footer">
-          <ElButton @click="dialogVisible = false">取消</ElButton>
-          <ElButton type="primary" @click="handleSubmit">确定</ElButton>
-        </span>
-      </template>
-    </ElDialog>
-  </div>
-</template>
-
 <script setup lang="ts">
-import { ElDialog, ElCard, ElForm, ElFormItem, ElInput, ElButton, ElTable, ElTableColumn, ElPagination, ElMessage, ElMessageBox } from 'element-plus';
-import { ref, reactive, onMounted } from 'vue';
-import type { FormInstance } from 'element-plus';
 import type { UserState } from '@vben/types';
-import { createUserApi, updateUserApi, deleteUserApi, getUserListApi } from '#/api/core/user';
-import type {  } from 'element-plus';
+import type { FormInstance } from 'element-plus';
+
+import { onMounted, reactive, ref } from 'vue';
+
+import { ElMessage, ElMessageBox } from 'element-plus';
+
+import {
+  createUserApi,
+  deleteUserApi,
+  getUserListApi,
+  updateUserApi,
+} from '#/api/core/user';
 
 interface QueryParams {
   search: string;
@@ -125,18 +45,26 @@ const formData = reactive<UserState>({
 const formRules = {
   username: [
     { required: true, message: '请输入用户名', trigger: 'blur' },
-    { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
+    { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' },
   ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' }
+    { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' },
   ],
   phone: [
-    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
+    {
+      pattern: /^1[3-9]\d{9}$/,
+      message: '请输入正确的手机号',
+      trigger: 'blur',
+    },
   ],
   email: [
-    { pattern: /^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$/, message: '请输入正确的邮箱地址', trigger: 'blur' }
-  ]
+    {
+      pattern: /^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$/,
+      message: '请输入正确的邮箱地址',
+      trigger: 'blur',
+    },
+  ],
 };
 
 const handleQuery = async () => {
@@ -144,7 +72,7 @@ const handleQuery = async () => {
     const res = await getUserListApi({
       search: queryParams.search,
       pageNum: queryParams.pageNum,
-      pageSize: queryParams.pageSize
+      pageSize: queryParams.pageSize,
     });
     userList.value = res.records;
     total.value = res.total;
@@ -184,7 +112,7 @@ const handleEdit = (row: UserState) => {
 const handleDelete = async (row: UserState) => {
   try {
     await ElMessageBox.confirm('确认要删除该用户吗？', '提示', {
-      type: 'warning'
+      type: 'warning',
     });
     await deleteUserApi(row.id!);
     ElMessage.success('删除成功');
@@ -207,10 +135,10 @@ const handleCurrentChange = (val: number) => {
 
 const handleSubmit = async () => {
   if (!formRef.value) return;
-  
+
   try {
     await formRef.value.validate();
-    
+
     if (editId) {
       await updateUserApi({ ...formData, id: editId });
       ElMessage.success('修改成功');
@@ -218,7 +146,7 @@ const handleSubmit = async () => {
       await createUserApi(formData);
       ElMessage.success('创建成功');
     }
-    
+
     dialogVisible.value = false;
     handleQuery();
   } catch (error) {
@@ -231,3 +159,90 @@ onMounted(() => {
   handleQuery();
 });
 </script>
+
+<template>
+  <div class="p-4">
+    <ElCard class="mb-4">
+      <ElForm :inline="true" :model="queryParams" class="flex flex-wrap gap-4">
+        <ElFormItem label="用户名">
+          <ElInput v-model="queryParams.search" placeholder="请输入用户名" />
+        </ElFormItem>
+
+        <ElFormItem>
+          <ElButton type="primary" @click="handleQuery">查询</ElButton>
+          <ElButton @click="resetQuery">重置</ElButton>
+        </ElFormItem>
+      </ElForm>
+    </ElCard>
+
+    <ElCard>
+      <template #header>
+        <div class="flex items-center justify-between">
+          <span>用户列表</span>
+          <ElButton type="primary" @click="handleAdd">新增用户</ElButton>
+        </div>
+      </template>
+
+      <ElTable :data="userList" border style="width: 100%">
+        <ElTableColumn label="账号" prop="username" />
+        <ElTableColumn label="昵称" prop="nickName" />
+        <ElTableColumn label="手机号" prop="phone" />
+        <ElTableColumn label="操作" width="200">
+          <template #default="{ row }">
+            <ElButton link type="primary" @click="handleEdit(row)">
+              编辑
+            </ElButton>
+            <ElButton link type="danger" @click="handleDelete(row)">
+              删除
+            </ElButton>
+          </template>
+        </ElTableColumn>
+      </ElTable>
+
+      <div class="mt-4 flex justify-end">
+        <ElPagination
+          v-model:current-page="queryParams.pageNum"
+          v-model:page-size="queryParams.pageSize"
+          :page-sizes="[10, 20, 30, 50]"
+          :total="total"
+          layout="total, sizes, prev, pager, next"
+          @current-change="handleCurrentChange"
+          @size-change="handleSizeChange"
+        />
+      </div>
+    </ElCard>
+
+    <ElDialog v-model="dialogVisible" :title="dialogTitle" width="500px">
+      <ElForm
+        ref="formRef"
+        :model="formData"
+        :rules="formRules"
+        label-width="80px"
+      >
+        <ElFormItem label="账号" prop="username">
+          <ElInput v-model="formData.username" placeholder="请输入用户名" />
+        </ElFormItem>
+        <ElFormItem v-if="!editId" label="密码" prop="password">
+          <ElInput
+            v-model="formData.password"
+            placeholder="请输入密码"
+            show-password
+            type="password"
+          />
+        </ElFormItem>
+        <ElFormItem label="昵称" prop="nickName">
+          <ElInput v-model="formData.nickName" placeholder="请输入昵称" />
+        </ElFormItem>
+        <ElFormItem label="手机号" prop="phone">
+          <ElInput v-model="formData.phone" placeholder="请输入手机号" />
+        </ElFormItem>
+      </ElForm>
+      <template #footer>
+        <span class="dialog-footer">
+          <ElButton @click="dialogVisible = false">取消</ElButton>
+          <ElButton type="primary" @click="handleSubmit">确定</ElButton>
+        </span>
+      </template>
+    </ElDialog>
+  </div>
+</template>

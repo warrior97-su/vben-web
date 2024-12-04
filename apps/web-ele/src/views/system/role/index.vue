@@ -1,126 +1,17 @@
-<template>
-  <div class="p-4">
-    <el-card class="mb-4">
-      <el-form :inline="true" :model="queryParams" class="flex flex-wrap gap-4">
-        <el-form-item label="角色名称">
-          <el-input
-            v-model="queryParams.name"
-            placeholder="请输入角色名称"
-          />
-        </el-form-item>
-        <!-- <el-form-item label="角色编码">
-          <el-input
-            v-model="queryParams.roleCode"
-            placeholder="请输入角色编码"
-          />
-        </el-form-item> -->
-        <!-- <el-form-item label="状态">
-          <el-select v-model="queryParams.status" placeholder="请选择状态">
-            <el-option label="启用" value="1" />
-            <el-option label="禁用" value="0" />
-          </el-select>
-        </el-form-item> -->
-        <el-form-item>
-          <el-button type="primary" @click="handleQuery">查询</el-button>
-          <el-button @click="resetQuery">重置</el-button>
-        </el-form-item>
-      </el-form>
-    </el-card>
-
-    <el-card>
-      <template #header>
-        <div class="flex items-center justify-between">
-          <span>角色列表</span>
-          <el-button type="primary" @click="handleAdd">新增角色</el-button>
-        </div>
-      </template>
-
-      <el-table :data="roleList" border style="width: 100%">
-        <el-table-column prop="name" label="角色名称" />
-        <el-table-column prop="description" label="角色描述" />
-        <!-- <el-table-column prop="status" label="状态">
-          <template #default="{ row }">
-            <el-tag :type="row.status === '1' ? 'success' : 'danger'">
-              {{ row.status === '1' ? '启用' : '禁用' }}
-            </el-tag>
-          </template>
-        </el-table-column> -->
-        <el-table-column prop="createTime" label="创建时间" />
-        <el-table-column label="操作" width="200">
-          <template #default="{ row }">
-            <el-button type="primary" link @click="handleEdit(row)">
-              编辑
-            </el-button>
-            <el-button type="primary" link @click="handleAssignPermission(row)"
-              >分配权限</el-button
-            >
-            <el-button type="danger" link @click="handleDelete(row)">
-              删除
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-
-      <div class="mt-4 flex justify-end">
-        <el-pagination
-          v-model:current-page="queryParams.pageNum"
-          v-model:page-size="queryParams.pageSize"
-          :total="total"
-          :page-sizes="[10, 20, 30, 50]"
-          layout="total, sizes, prev, pager, next"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
-    </el-card>
-
-    <!-- 新增/编辑角色对话框 -->
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px">
-      <el-form
-        ref="formRef"
-        :model="formData"
-        label-width="100px"
-        :rules="formRules"
-      >
-        <el-form-item label="角色名称" prop="name">
-          <el-input v-model="formData.name" placeholder="请输入角色名称" />
-        </el-form-item>
-        <el-form-item label="备注" prop="description">
-          <el-input
-            v-model="formData.description"
-            type="textarea"
-            placeholder="请输入备注"
-            :rows="3"
-          />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleSubmit">确定</el-button>
-        </span>
-      </template>
-    </el-dialog>
-  </div>
-</template>
-
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
-import {
-  ElCard,
-  ElForm,
-  ElFormItem,
-  ElInput,
-  ElTable,
-  ElTableColumn,
-  ElButton,
-  ElPagination,
-} from 'element-plus';
-import { ElMessage } from 'element-plus';
-import { ElDialog } from 'element-plus';
-import type { FormInstance } from 'element-plus';
 import type { RoleState } from '@vben/types';
-import { createRoleApi, getRoleListApi, deleteRoleApi, updateRoleApi } from '#/api/core/role';
+import type { FormInstance } from 'element-plus';
+
+import { reactive, ref } from 'vue';
+
+import { ElDialog, ElMessage } from 'element-plus';
+
+import {
+  createRoleApi,
+  deleteRoleApi,
+  getRoleListApi,
+  updateRoleApi,
+} from '#/api/core/role';
 
 interface QueryParams {
   name: string;
@@ -214,14 +105,12 @@ const handleSubmit = async () => {
   await formRef.value.validate(async (valid) => {
     if (valid) {
       try {
-        if (editId) {
-          await updateRoleApi({
-            ...formData,
-            id: editId,
-          });
-        } else {
-          await createRoleApi(formData);
-        }
+        await (editId
+          ? updateRoleApi({
+              ...formData,
+              id: editId,
+            })
+          : createRoleApi(formData));
         ElMessage.success('创建成功');
         dialogVisible.value = false;
         handleQuery(); // 刷新列表
@@ -241,3 +130,106 @@ const handleEdit = (row: any) => {
   // TODO: 实现编辑角色逻辑
 };
 </script>
+
+<template>
+  <div class="p-4">
+    <el-card class="mb-4">
+      <el-form :inline="true" :model="queryParams" class="flex flex-wrap gap-4">
+        <el-form-item label="角色名称">
+          <el-input v-model="queryParams.name" placeholder="请输入角色名称" />
+        </el-form-item>
+        <!-- <el-form-item label="角色编码">
+          <el-input
+            v-model="queryParams.roleCode"
+            placeholder="请输入角色编码"
+          />
+        </el-form-item> -->
+        <!-- <el-form-item label="状态">
+          <el-select v-model="queryParams.status" placeholder="请选择状态">
+            <el-option label="启用" value="1" />
+            <el-option label="禁用" value="0" />
+          </el-select>
+        </el-form-item> -->
+        <el-form-item>
+          <el-button type="primary" @click="handleQuery">查询</el-button>
+          <el-button @click="resetQuery">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </el-card>
+
+    <el-card>
+      <template #header>
+        <div class="flex items-center justify-between">
+          <span>角色列表</span>
+          <el-button type="primary" @click="handleAdd">新增角色</el-button>
+        </div>
+      </template>
+
+      <el-table :data="roleList" border style="width: 100%">
+        <el-table-column label="角色名称" prop="name" />
+        <el-table-column label="角色描述" prop="description" />
+        <!-- <el-table-column prop="status" label="状态">
+          <template #default="{ row }">
+            <el-tag :type="row.status === '1' ? 'success' : 'danger'">
+              {{ row.status === '1' ? '启用' : '禁用' }}
+            </el-tag>
+          </template>
+        </el-table-column> -->
+        <el-table-column label="创建时间" prop="createTime" />
+        <el-table-column label="操作" width="200">
+          <template #default="{ row }">
+            <el-button link type="primary" @click="handleEdit(row)">
+              编辑
+            </el-button>
+            <el-button link type="primary" @click="handleAssignPermission(row)">
+              分配权限
+            </el-button>
+            <el-button link type="danger" @click="handleDelete(row)">
+              删除
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <div class="mt-4 flex justify-end">
+        <el-pagination
+          v-model:current-page="queryParams.pageNum"
+          v-model:page-size="queryParams.pageSize"
+          :page-sizes="[10, 20, 30, 50]"
+          :total="total"
+          layout="total, sizes, prev, pager, next"
+          @current-change="handleCurrentChange"
+          @size-change="handleSizeChange"
+        />
+      </div>
+    </el-card>
+
+    <!-- 新增/编辑角色对话框 -->
+    <ElDialog v-model="dialogVisible" :title="dialogTitle" width="500px">
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :rules="formRules"
+        label-width="100px"
+      >
+        <el-form-item label="角色名称" prop="name">
+          <el-input v-model="formData.name" placeholder="请输入角色名称" />
+        </el-form-item>
+        <el-form-item label="备注" prop="description">
+          <el-input
+            v-model="formData.description"
+            :rows="3"
+            placeholder="请输入备注"
+            type="textarea"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="handleSubmit">确定</el-button>
+        </span>
+      </template>
+    </ElDialog>
+  </div>
+</template>

@@ -1,48 +1,48 @@
 <template>
   <div class="p-4">
-    <el-card class="mb-4">
+    <ElCard class="mb-4">
       <div class="flex justify-between items-center">
-        <el-form :inline="true" :model="searchForm" class="flex-1">
-          <el-form-item label="书名">
-            <el-input v-model="searchForm.name" placeholder="请输入书名" />
-          </el-form-item>
-          <el-form-item label="作者">
-            <el-input v-model="searchForm.author" placeholder="请输入作者" />
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="handleSearch">搜索</el-button>
-          </el-form-item>
-        </el-form>
-        <el-button type="primary" @click="handleAdd">新增图书</el-button>
+        <ElForm :inline="true" :model="searchForm" class="flex-1">
+          <ElFormItem label="书名">
+            <ElInput v-model="searchForm.name" placeholder="请输入书名" />
+          </ElFormItem>
+          <ElFormItem label="作者">
+            <ElInput v-model="searchForm.author" placeholder="请输入作者" />
+          </ElFormItem>
+          <ElFormItem>
+            <ElButton type="primary" @click="handleSearch">搜索</ElButton>
+          </ElFormItem>
+        </ElForm>
+        <ElButton type="primary" @click="handleAdd">新增图书</ElButton>
       </div>
-    </el-card>
+    </ElCard>
 
-    <el-card>
-      <el-table :data="tableData" border style="width: 100%">
-        <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="name" label="书名" />
-        <el-table-column prop="author" label="作者" />
-        <el-table-column prop="publisher" label="出版社" />
-        <el-table-column prop="isbn" label="ISBN" />
-        <el-table-column prop="price" label="价格" />
-        <el-table-column prop="stock" label="库存" />
-        <el-table-column prop="status" label="状态">
+    <ElCard>
+      <ElTable :data="tableData" border style="width: 100%">
+        <ElTableColumn prop="id" label="ID" width="80" />
+        <ElTableColumn prop="name" label="书名" />
+        <ElTableColumn prop="author" label="作者" />
+        <ElTableColumn prop="publisher" label="出版社" />
+        <ElTableColumn prop="isbn" label="ISBN" />
+        <ElTableColumn prop="price" label="价格" />
+        <ElTableColumn prop="stock" label="库存" />
+        <!-- <ElTableColumn prop="status" label="状态">
           <template #default="scope">
-            <el-tag :type="scope.row.status === '可借' ? 'success' : 'danger'">
+            <ElTag :type="scope.row.status === '可借' ? 'success' : 'danger'">
               {{ scope.row.status }}
-            </el-tag>
+            </ElTag>
           </template>
-        </el-table-column>
-        <el-table-column fixed="right" label="操作" width="180">
+        </ElTableColumn> -->
+        <!-- <ElTableColumn fixed="right" label="操作" width="180">
           <template #default="scope">
-            <el-button type="primary" link @click="handleEdit(scope.row)">编辑</el-button>
-            <el-button type="danger" link @click="handleDelete(scope.row)">删除</el-button>
+            <ElButton type="primary" link @click="handleEdit(scope.row)">编辑</ElButton>
+            <ElButton type="danger" link @click="handleDelete(scope.row)">删除</ElButton>
           </template>
-        </el-table-column>
-      </el-table>
+        </ElTableColumn> -->
+      </ElTable>
 
       <div class="flex justify-center mt-4">
-        <el-pagination
+        <ElPagination
           v-model:current-page="currentPage"
           v-model:page-size="pageSize"
           :total="total"
@@ -52,46 +52,46 @@
           @current-change="handleCurrentChange"
         />
       </div>
-    </el-card>
+    </ElCard>
 
-    <el-dialog
+    <ElDialog
       v-model="dialogVisible"
       :title="dialogType === 'add' ? '新增图书' : '编辑图书'"
       width="500px"
     >
-      <el-form
+      <ElForm
         ref="formRef"
         :model="form"
         :rules="rules"
         label-width="80px"
         class="mt-4"
       >
-        <el-form-item label="书名" prop="name">
-          <el-input v-model="form.name" />
-        </el-form-item>
-        <el-form-item label="作者" prop="author">
-          <el-input v-model="form.author" />
-        </el-form-item>
-        <el-form-item label="出版社" prop="publisher">
-          <el-input v-model="form.publisher" />
-        </el-form-item>
-        <el-form-item label="ISBN" prop="isbn">
-          <el-input v-model="form.isbn" />
-        </el-form-item>
-        <el-form-item label="价格" prop="price">
-          <el-input-number v-model="form.price" :precision="2" :step="0.1" />
-        </el-form-item>
-        <el-form-item label="库存" prop="stock">
-          <el-input-number v-model="form.stock" :min="0" :step="1" />
-        </el-form-item>
-      </el-form>
+        <ElFormItem label="书名" prop="name">
+          <ElInput v-model="form.name" />
+        </ElFormItem>
+        <ElFormItem label="作者" prop="author">
+          <ElInput v-model="form.author" />
+        </ElFormItem>
+        <ElFormItem label="出版社" prop="publisher">
+          <ElInput v-model="form.publisher" />
+        </ElFormItem>
+        <ElFormItem label="ISBN" prop="isbn">
+          <ElInput v-model="form.isbn" />
+        </ElFormItem>
+        <ElFormItem label="价格" prop="price">
+          <ElInputNumber v-model="form.price" :precision="2" :step="0.1" />
+        </ElFormItem>
+        <ElFormItem label="库存" prop="stock">
+          <ElInputNumber v-model="form.stock" :min="0" :step="1" />
+        </ElFormItem>
+      </ElForm>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleSubmit">确定</el-button>
+          <ElButton @click="dialogVisible = false">取消</ElButton>
+          <ElButton type="primary" @click="handleSubmit">确定</ElButton>
         </span>
       </template>
-    </el-dialog>
+    </ElDialog>
   </div>
 </template>
 

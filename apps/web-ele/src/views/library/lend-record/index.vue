@@ -31,14 +31,14 @@
         <el-table-column prop="lendDate" label="借阅日期" />
         <el-table-column prop="returnDate" label="应还日期" />
         <el-table-column prop="actualReturnDate" label="实际归还日期" />
-        <el-table-column prop="status" label="状态">
+        <!-- <el-table-column prop="status" label="状态">
           <template #default="scope">
             <el-tag :type="scope.row.status === 'borrowed' ? 'warning' : 'success'">
               {{ scope.row.status === 'borrowed' ? '已借出' : '已归还' }}
             </el-tag>
           </template>
-        </el-table-column>
-        <el-table-column fixed="right" label="操作" width="120">
+        </el-table-column> -->
+        <!-- <el-table-column fixed="right" label="操作" width="120">
           <template #default="scope">
             <el-button
               v-if="scope.row.status === 'borrowed'"
@@ -49,7 +49,7 @@
               归还
             </el-button>
           </template>
-        </el-table-column>
+        </el-table-column> -->
       </el-table>
 
       <div class="flex justify-center mt-4">

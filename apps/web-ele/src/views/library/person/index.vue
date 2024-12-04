@@ -49,7 +49,7 @@
               label="实际归还日期"
               width="120"
             />
-            <el-table-column prop="status" label="状态" width="100">
+            <!-- <el-table-column prop="status" label="状态" width="100">
               <template #default="scope">
                 <el-tag
                   :type="scope.row.status === 'borrowed' ? 'warning' : 'success'"
@@ -69,7 +69,7 @@
                   归还
                 </el-button>
               </template>
-            </el-table-column>
+            </el-table-column> -->
           </el-table>
 
           <div class="flex justify-center mt-4">

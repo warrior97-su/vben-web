@@ -4,20 +4,7 @@ import type { FormInstance } from 'element-plus';
 
 import { onMounted, reactive, ref } from 'vue';
 
-import {
-  ElButton,
-  ElCard,
-  ElDialog,
-  ElForm,
-  ElFormItem,
-  ElInput,
-  ElInputNumber,
-  ElMessage,
-  ElMessageBox,
-  ElTable,
-  ElTableColumn,
-  ElTreeSelect,
-} from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 
 import {
   createMenuApi,

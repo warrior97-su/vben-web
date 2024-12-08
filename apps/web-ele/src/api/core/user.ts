@@ -1,21 +1,19 @@
-import type { UserState, UserInfo } from '@vben/types';
-import { springBootRequestClient } from '#/api/request';
+import type { UserInfo, UserState } from '@vben/types';
 
-import { requestClient } from '#/api/request';
+import { springBootRequestClient } from '#/api/request';
 
 /**
  * 获取用户信息
  */
-export async function getUserInfoApi() {
-  return requestClient.get<UserInfo>('/user/info');
+export async function getUserInfoApi(id?: string) {
+  return springBootRequestClient.get<UserInfo>(`/user/info/${id}`);
 }
 
-
 // 获取用户列表
-export async function getUserListApi(params: { 
-  search?: string;
+export async function getUserListApi(params: {
   pageNum: number;
   pageSize: number;
+  search?: string;
 }) {
   return springBootRequestClient.get('/user', { params });
 }
@@ -38,4 +36,13 @@ export async function updateUserApi(data: UserState) {
 // 删除用户
 export async function deleteUserApi(id: number) {
   return springBootRequestClient.delete(`/user/${id}`);
+}
+
+// login
+export async function loginApi(data: { password: string; username: string }) {
+  return springBootRequestClient.post('/user/login', data);
+}
+
+export async function getUserProfileApiByToken() {
+  return springBootRequestClient.get('/user/profile');
 }

@@ -13,6 +13,8 @@ import {
   updateRoleApi,
 } from '#/api/core/role';
 
+import AuthDialog from './components/AuthDialog.vue';
+
 interface QueryParams {
   name: string;
   roleCode: string;
@@ -47,8 +49,12 @@ const resetQuery = () => {
   handleQuery();
 };
 
+const authDialogVisible = ref(false);
+const currentRoleId = ref<number>(0);
+
 const handleAssignPermission = (row: any) => {
-  // TODO: 实现分配权限逻辑
+  currentRoleId.value = row.id;
+  authDialogVisible.value = true;
 };
 
 const handleDelete = (row: any) => {
@@ -231,5 +237,7 @@ const handleEdit = (row: any) => {
         </span>
       </template>
     </ElDialog>
+
+    <AuthDialog v-model:visible="authDialogVisible" :role-id="currentRoleId" />
   </div>
 </template>

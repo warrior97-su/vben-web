@@ -13,6 +13,8 @@ import {
   updateUserApi,
 } from '#/api/core/user';
 
+import UserRoleDialog from './components/UserRoleDialog.vue';
+
 interface QueryParams {
   search: string;
   pageNum: number;
@@ -66,6 +68,9 @@ const formRules = {
     },
   ],
 };
+
+const roleDialogVisible = ref(false);
+const currentUserId = ref<number>(0);
 
 const handleQuery = async () => {
   try {
@@ -155,6 +160,11 @@ const handleSubmit = async () => {
   }
 };
 
+const handleBindRole = (row: UserState) => {
+  currentUserId.value = row.id!;
+  roleDialogVisible.value = true;
+};
+
 onMounted(() => {
   handleQuery();
 });
@@ -189,6 +199,9 @@ onMounted(() => {
         <ElTableColumn label="手机号" prop="phone" />
         <ElTableColumn label="操作" width="200">
           <template #default="{ row }">
+            <ElButton link type="primary" @click="handleBindRole(row)">
+              绑定角色
+            </ElButton>
             <ElButton link type="primary" @click="handleEdit(row)">
               编辑
             </ElButton>
@@ -244,5 +257,10 @@ onMounted(() => {
         </span>
       </template>
     </ElDialog>
+
+    <UserRoleDialog
+      v-model:visible="roleDialogVisible"
+      :user-id="currentUserId"
+    />
   </div>
 </template>

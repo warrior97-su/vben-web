@@ -1,5 +1,6 @@
 import { defineConfig } from '@vben/vite-config';
 
+import AutoImport from 'unplugin-auto-import/vite';
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 import Components from 'unplugin-vue-components/vite';
 
@@ -8,6 +9,9 @@ export default defineConfig(async () => {
     application: {},
     vite: {
       plugins: [
+        AutoImport({
+          imports: ['@vueuse/core', 'vue'],
+        }),
         Components({
           dirs: ['src/components'],
           resolvers: [

@@ -16,6 +16,7 @@ export interface MenuCreate {
   icon?: string;
   pid: number;
   sort: number;
+  title?: string;
 }
 
 export interface MenuUpdate {
@@ -25,4 +26,5 @@ export interface MenuUpdate {
   component?: string;
   icon?: string;
   sort: number;
+  title?: string;
 }

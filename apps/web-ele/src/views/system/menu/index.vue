@@ -29,6 +29,7 @@ const menuForm = reactive<{ id?: number } & MenuCreate>({
   icon: '',
   pid: 0,
   sort: 0,
+  title: '',
 });
 
 const rules = {
@@ -36,6 +37,7 @@ const rules = {
   path: [{ required: true, message: '请输入路由地址', trigger: 'blur' }],
   pid: [{ required: true, message: '请选择上级菜单', trigger: 'change' }],
   sort: [{ required: true, message: '请输入显示排序', trigger: 'blur' }],
+  title: [{ required: true, message: '请输入菜单标题', trigger: 'blur' }],
 };
 
 const getList = async () => {
@@ -98,6 +100,7 @@ const submitForm = async () => {
             component: menuForm.component,
             icon: menuForm.icon,
             sort: menuForm.sort,
+            title: menuForm.title,
           };
           await updateMenuApi(updateData);
           ElMessage.success('修改成功');
@@ -109,6 +112,7 @@ const submitForm = async () => {
             icon: menuForm.icon,
             pid: menuForm.pid,
             sort: menuForm.sort,
+            title: menuForm.title,
           };
           await createMenuApi(createData);
           ElMessage.success('新增成功');
@@ -149,6 +153,7 @@ onMounted(() => {
         <ElTableColumn label="排序" prop="sort" width="80" />
         <ElTableColumn label="路由地址" prop="path" />
         <ElTableColumn label="组件路径" prop="component" />
+        <ElTableColumn label="菜单标题" prop="title" />
         <ElTableColumn label="操作" width="180">
           <template #default="{ row }">
             <ElButton link type="primary" @click="handleEdit(row)">
@@ -185,8 +190,11 @@ onMounted(() => {
             placeholder="选择上级菜单"
           />
         </ElFormItem>
-        <ElFormItem label="菜单名称" prop="name">
-          <ElInput v-model="menuForm.name" placeholder="请输入菜单名称" />
+        <ElFormItem label="菜单标题" prop="title">
+          <ElInput v-model="menuForm.title" placeholder="请输入菜单标题" />
+        </ElFormItem>
+        <ElFormItem label="组件名称" prop="name">
+          <ElInput v-model="menuForm.name" placeholder="请输入组件名称" />
         </ElFormItem>
         <ElFormItem label="路由地址" prop="path">
           <ElInput v-model="menuForm.path" placeholder="请输入路由地址" />
@@ -197,6 +205,7 @@ onMounted(() => {
         <ElFormItem label="菜单图标" prop="icon">
           <ElInput v-model="menuForm.icon" placeholder="请输入菜单图标" />
         </ElFormItem>
+
         <ElFormItem label="显示排序" prop="sort">
           <ElInputNumber v-model="menuForm.sort" :min="0" />
         </ElFormItem>

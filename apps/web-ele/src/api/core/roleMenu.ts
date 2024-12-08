@@ -24,6 +24,6 @@ export function assignMenusApi(roleId: number, menuIds: number[]) {
 // 获取角色菜单ID
 export function getRoleMenuIdsApi(roleId: number) {
   return springBootRequestClient.get<number[]>(
-    `/api/role-menu/menuIds/${roleId}`,
+    `/api/role-menu/role/menuIds/${roleId}`,
   );
 }

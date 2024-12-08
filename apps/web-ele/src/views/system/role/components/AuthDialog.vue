@@ -6,7 +6,7 @@ import { ref } from 'vue';
 import { ElMessage } from 'element-plus';
 
 import { getMenuListApi } from '#/api/core/menu';
-import { assignMenusApi, getRoleMenusApi } from '#/api/core/roleMenu';
+import { assignMenusApi, getRoleMenuIdsApi } from '#/api/core/roleMenu';
 
 const props = defineProps<{
   roleId: number;
@@ -37,8 +37,8 @@ const getMenuTree = async () => {
     menuList.value = menuRes;
 
     // 获取角色已有的菜单权限
-    const roleMenus = await getRoleMenusApi(props.roleId);
-    menuIds.value = roleMenus.map((menu) => menu.id!);
+    const roleMenus = await getRoleMenuIdsApi(props.roleId);
+    menuIds.value = roleMenus;
   } catch (error) {
     console.error('获取菜单失败:', error);
     ElMessage.error('获取菜单失败');

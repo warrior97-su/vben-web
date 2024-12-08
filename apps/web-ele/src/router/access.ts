@@ -5,6 +5,7 @@ import type {
 
 import { generateAccessible } from '@vben/access';
 import { preferences } from '@vben/preferences';
+import { useUserStore } from '@vben/stores';
 
 import { ElMessage } from 'element-plus';
 
@@ -29,7 +30,8 @@ async function generateAccess(options: GenerateMenuAndRoutesOptions) {
         duration: 1500,
         message: `${$t('common.loadingMenu')}...`,
       });
-      return await getRoleMenusApi(6);
+      const userStore = useUserStore();
+      return await getRoleMenusApi(userStore.userRoles[0]?.id || 6);
     },
     // 可以指定没有权限跳转403页面
     forbiddenComponent,

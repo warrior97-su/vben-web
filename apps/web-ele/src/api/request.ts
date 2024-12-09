@@ -75,7 +75,7 @@ function createRequestClient(baseURL: string) {
       const { data: responseData, status } = response;
 
       const { code, data } = responseData;
-      if (status >= 200 && status < 400 && code === 0) {
+      if (status >= 200 && status < 400 && code === '0') {
         return data;
       }
       throw Object.assign({}, response, { response });
@@ -140,12 +140,11 @@ function createSpringBootRequestClient(baseURL: string) {
       throw Object.assign({}, response, { response });
     },
   });
-
   return client;
 }
 
 export const baseRequestClient = new RequestClient({ baseURL: apiURL });
 
 export const springBootRequestClient = createSpringBootRequestClient(
-  'http://localhost:9090',
+  'http://49.234.181.38:9090',
 );

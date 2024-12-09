@@ -84,13 +84,17 @@ watch(
       :data="menuList"
       :default-checked-keys="menuIds"
       :props="{
-        label: 'name',
+        label: 'title',
         children: 'children',
       }"
       node-key="id"
       show-checkbox
       v-loading="loading"
-    />
+    >
+      <template #default="{ node }">
+        <span>{{ $t(node.label) }}</span>
+      </template>
+    </ElTree>
     <template #footer>
       <span class="dialog-footer">
         <ElButton @click="handleClose">取 消</ElButton>

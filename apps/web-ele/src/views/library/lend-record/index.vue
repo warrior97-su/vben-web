@@ -1,22 +1,186 @@
+<script setup lang="ts">
+import type { FormInstance, FormRules } from 'element-plus';
+
+import { reactive, ref } from 'vue';
+
+import { ElMessage } from 'element-plus';
+
+import {
+  createLendRecord,
+  getLendRecordList,
+  searchBooks,
+  searchUsers,
+} from '#/api/library/lend-record';
+
+interface BookOption {
+  id: string;
+  name: string;
+  isbn: string;
+}
+
+interface UserOption {
+  id: string;
+  name: string;
+}
+
+interface TableRecord {
+  id: string;
+  bookName: string;
+  username: string;
+  lendDate: string;
+  returnDate: string;
+  actualReturnDate: null | string;
+  status: 'borrowed' | 'returned';
+}
+
+const searchForm = reactive({
+  search1: '',
+  status: '',
+});
+
+const tableData = ref<TableRecord[]>([]);
+const currentPage = ref(1);
+const pageSize = ref(10);
+const total = ref(0);
+
+const loadData = async () => {
+  try {
+    const { records, total: totalCount } = await getLendRecordList({
+      search2: searchForm.search1,
+      status: searchForm.status,
+      pageNum: currentPage.value,
+      pageSize: pageSize.value,
+    });
+    tableData.value = records;
+    total.value = totalCount;
+  } catch {
+    ElMessage.error('获取数据失败');
+  }
+};
+
+const dialogVisible = ref(false);
+const formRef = ref<FormInstance>();
+
+const form = reactive({
+  bookname: '',
+  isbn: '',
+  readerId: 0,
+  lendTime: '',
+  returnTime: '',
+  status: 'borrowed',
+  borrownum: 1,
+});
+
+const rules = reactive<FormRules>({
+  isbn: [{ required: true, message: '请选择图书', trigger: 'change' }],
+  readerId: [{ required: true, message: '请选择用户', trigger: 'change' }],
+  lendTime: [{ required: true, message: '请选择借阅日期', trigger: 'change' }],
+  returnTime: [
+    { required: true, message: '请选择应还日期', trigger: 'change' },
+  ],
+});
+
+const bookLoading = ref(false);
+const userLoading = ref(false);
+const bookOptions = ref<BookOption[]>([]);
+const userOptions = ref<UserOption[]>([]);
+
+const handleSearch = () => {
+  // TODO: 实现搜索功能
+  loadData();
+};
+
+const handleAdd = () => {
+  dialogVisible.value = true;
+  form.bookname = '';
+  form.isbn = '';
+  form.readerId = 0;
+  form.lendTime = '';
+  form.returnTime = '';
+  form.status = 'borrowed';
+  form.borrownum = 1;
+};
+
+const handleSubmit = async () => {
+  if (!formRef.value) return;
+  await formRef.value.validate(async (valid) => {
+    if (valid) {
+      try {
+        await createLendRecord(form);
+        ElMessage.success('借阅成功');
+        dialogVisible.value = false;
+        loadData();
+      } catch {
+        ElMessage.error('借阅失败');
+      }
+    }
+  });
+};
+
+const handleSizeChange = (val: number) => {
+  pageSize.value = val;
+  loadData();
+};
+
+const handleCurrentChange = (val: number) => {
+  currentPage.value = val;
+  loadData();
+};
+
+const handleBookSearch = async (query: string) => {
+  if (query) {
+    bookLoading.value = true;
+    try {
+      const { data } = await searchBooks(query);
+      bookOptions.value = data.records;
+    } catch {
+      ElMessage.error('搜索图书失败');
+    } finally {
+      bookLoading.value = false;
+    }
+  } else {
+    bookOptions.value = [];
+  }
+};
+
+const handleUserSearch = async (query: string) => {
+  if (query) {
+    userLoading.value = true;
+    try {
+      const { data } = await searchUsers(query);
+      userOptions.value = data;
+    } catch {
+      ElMessage.error('搜索用户失败');
+    } finally {
+      userLoading.value = false;
+    }
+  } else {
+    userOptions.value = [];
+  }
+};
+
+// 添加重置函数
+const handleReset = () => {
+  searchForm.search1 = '';
+  searchForm.status = '';
+  loadData();
+};
+
+// 初始加载
+loadData();
+</script>
+
 <template>
   <div class="p-4">
     <el-card class="mb-4">
-      <div class="flex justify-between items-center">
+      <div class="flex items-center justify-between">
         <el-form :inline="true" :model="searchForm" class="flex-1">
           <el-form-item label="书名">
-            <el-input v-model="searchForm.bookName" placeholder="请输入书名" />
-          </el-form-item>
-          <el-form-item label="用户名">
-            <el-input v-model="searchForm.username" placeholder="请输入用户名" />
-          </el-form-item>
-          <el-form-item label="状态">
-            <el-select v-model="searchForm.status" placeholder="请选择状态">
-              <el-option label="已借出" value="borrowed" />
-              <el-option label="已归还" value="returned" />
-            </el-select>
+            <el-input v-model="searchForm.search1" placeholder="请输入书名" />
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="handleSearch">搜索</el-button>
+            <el-button @click="handleReset">重置</el-button>
           </el-form-item>
         </el-form>
         <el-button type="primary" @click="handleAdd">新增借阅</el-button>
@@ -25,42 +189,23 @@
 
     <el-card>
       <el-table :data="tableData" border style="width: 100%">
-        <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="bookName" label="书名" />
-        <el-table-column prop="username" label="借阅人" />
-        <el-table-column prop="lendDate" label="借阅日期" />
-        <el-table-column prop="returnDate" label="应还日期" />
-        <el-table-column prop="actualReturnDate" label="实际归还日期" />
-        <!-- <el-table-column prop="status" label="状态">
-          <template #default="scope">
-            <el-tag :type="scope.row.status === 'borrowed' ? 'warning' : 'success'">
-              {{ scope.row.status === 'borrowed' ? '已借出' : '已归还' }}
-            </el-tag>
-          </template>
-        </el-table-column> -->
-        <!-- <el-table-column fixed="right" label="操作" width="120">
-          <template #default="scope">
-            <el-button
-              v-if="scope.row.status === 'borrowed'"
-              type="primary"
-              link
-              @click="handleReturn(scope.row)"
-            >
-              归还
-            </el-button>
-          </template>
-        </el-table-column> -->
+        <el-table-column label="书名" prop="bookname" />
+        <el-table-column label="借阅人" prop="readerId" />
+        <el-table-column label="借阅日期" prop="lendTime" />
+        <el-table-column label="应还日期" prop="returnTime" />
+        <el-table-column label="借阅数量" prop="borrownum" />
+        <el-table-column label="状态" prop="status" />
       </el-table>
 
-      <div class="flex justify-center mt-4">
+      <div class="mt-4 flex justify-end">
         <el-pagination
           v-model:current-page="currentPage"
           v-model:page-size="pageSize"
-          :total="total"
           :page-sizes="[10, 20, 30, 50]"
+          :total="total"
           layout="total, sizes, prev, pager, next"
-          @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
+          @size-change="handleSizeChange"
         />
       </div>
     </el-card>
@@ -70,55 +215,67 @@
         ref="formRef"
         :model="form"
         :rules="rules"
-        label-width="80px"
         class="mt-4"
+        label-width="80px"
       >
-        <el-form-item label="图书" prop="bookId">
+        <el-form-item label="图书" prop="isbn">
           <el-select
-            v-model="form.bookId"
-            filterable
-            remote
-            :remote-method="handleBookSearch"
+            v-model="form.isbn"
             :loading="bookLoading"
+            :remote-method="handleBookSearch"
+            filterable
             placeholder="请输入书名搜索"
+            remote
+            @change="
+              (val) => {
+                const book = bookOptions.find(
+                  (b: BookOption) => b.isbn === val,
+                );
+                if (book) {
+                  form.bookname = book.name;
+                }
+              }
+            "
           >
             <el-option
               v-for="item in bookOptions"
+              :key="item.isbn"
+              :label="item.name"
+              :value="item.isbn"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="用户" prop="readerId">
+          <el-select
+            v-model="form.readerId"
+            :loading="userLoading"
+            :remote-method="handleUserSearch"
+            filterable
+            placeholder="请输入用户名搜索"
+            remote
+          >
+            <el-option
+              v-for="item in userOptions"
               :key="item.id"
               :label="item.name"
               :value="item.id"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="用户" prop="userId">
-          <el-select
-            v-model="form.userId"
-            filterable
-            remote
-            :remote-method="handleUserSearch"
-            :loading="userLoading"
-            placeholder="请输入用户名搜索"
-          >
-            <el-option
-              v-for="item in userOptions"
-              :key="item.id"
-              :label="item.username"
-              :value="item.id"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="借阅日期" prop="lendDate">
+        <el-form-item label="借阅日期" prop="lendTime">
           <el-date-picker
-            v-model="form.lendDate"
-            type="date"
+            v-model="form.lendTime"
             placeholder="选择借阅日期"
+            type="date"
+            value-format="YYYY-MM-DD"
           />
         </el-form-item>
-        <el-form-item label="应还日期" prop="returnDate">
+        <el-form-item label="应还日期" prop="returnTime">
           <el-date-picker
-            v-model="form.returnDate"
-            type="date"
+            v-model="form.returnTime"
             placeholder="选择应还日期"
+            type="date"
+            value-format="YYYY-MM-DD"
           />
         </el-form-item>
       </el-form>
@@ -131,158 +288,3 @@
     </el-dialog>
   </div>
 </template>
-
-<script setup lang="ts">
-import { ref, reactive } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
-import { ElMessage, ElMessageBox } from 'element-plus'
-
-const searchForm = reactive({
-  bookName: '',
-  username: '',
-  status: '',
-})
-
-const tableData = ref([])
-const currentPage = ref(1)
-const pageSize = ref(10)
-const total = ref(0)
-
-const dialogVisible = ref(false)
-const formRef = ref<FormInstance>()
-
-const form = reactive({
-  bookId: '',
-  userId: '',
-  lendDate: '',
-  returnDate: '',
-})
-
-const rules = reactive<FormRules>({
-  bookId: [
-    { required: true, message: '请选择图书', trigger: 'change' },
-  ],
-  userId: [
-    { required: true, message: '请选择用户', trigger: 'change' },
-  ],
-  lendDate: [
-    { required: true, message: '请选择借阅日期', trigger: 'change' },
-  ],
-  returnDate: [
-    { required: true, message: '请选择应还日期', trigger: 'change' },
-  ],
-})
-
-const bookLoading = ref(false)
-const userLoading = ref(false)
-const bookOptions = ref([])
-const userOptions = ref([])
-
-const handleSearch = () => {
-  // TODO: 实现搜索功能
-  loadData()
-}
-
-const handleAdd = () => {
-  dialogVisible.value = true
-  form.bookId = ''
-  form.userId = ''
-  form.lendDate = ''
-  form.returnDate = ''
-}
-
-const handleReturn = (row: any) => {
-  ElMessageBox.confirm('确认归还该图书吗？', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning',
-  }).then(() => {
-    // TODO: 实现归还功能
-    ElMessage.success('归还成功')
-    loadData()
-  })
-}
-
-const handleSubmit = async () => {
-  if (!formRef.value) return
-  await formRef.value.validate((valid) => {
-    if (valid) {
-      // TODO: 实现提交功能
-      ElMessage.success('借阅成功')
-      dialogVisible.value = false
-      loadData()
-    }
-  })
-}
-
-const handleSizeChange = (val: number) => {
-  pageSize.value = val
-  loadData()
-}
-
-const handleCurrentChange = (val: number) => {
-  currentPage.value = val
-  loadData()
-}
-
-const handleBookSearch = (query: string) => {
-  if (query) {
-    bookLoading.value = true
-    // TODO: 实现图书搜索功能
-    setTimeout(() => {
-      bookOptions.value = [
-        { id: '1', name: '深入理解计算机系统' },
-        { id: '2', name: 'JavaScript高级程序设计' },
-      ]
-      bookLoading.value = false
-    }, 200)
-  } else {
-    bookOptions.value = []
-  }
-}
-
-const handleUserSearch = (query: string) => {
-  if (query) {
-    userLoading.value = true
-    // TODO: 实现用户搜索功能
-    setTimeout(() => {
-      userOptions.value = [
-        { id: '1', username: '张三' },
-        { id: '2', username: '李四' },
-      ]
-      userLoading.value = false
-    }, 200)
-  } else {
-    userOptions.value = []
-  }
-}
-
-const loadData = () => {
-  // TODO: 实现数据加载功能
-  // 模拟数据
-  tableData.value = [
-    {
-      id: '1',
-      bookName: '深入理解计算机系统',
-      username: '张三',
-      lendDate: '2024-01-01',
-      returnDate: '2024-02-01',
-      actualReturnDate: null,
-      status: 'borrowed',
-    },
-    {
-      id: '2',
-      bookName: 'JavaScript高级程序设计',
-      username: '李四',
-      lendDate: '2024-01-15',
-      returnDate: '2024-02-15',
-      actualReturnDate: '2024-02-10',
-      status: 'returned',
-    },
-  ]
-  total.value = 100
-}
-
-// 初始加载
-loadData()
-</script>

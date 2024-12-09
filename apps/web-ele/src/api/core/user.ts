@@ -1,6 +1,6 @@
 import type { UserInfo, UserState } from '@vben/types';
 
-import { springBootRequestClient } from '#/api/request';
+import { requestClient, springBootRequestClient } from '#/api/request';
 
 /**
  * 获取用户信息
@@ -44,5 +44,5 @@ export async function loginApi(data: { password: string; username: string }) {
 }
 
 export async function getUserProfileApiByToken() {
-  return springBootRequestClient.get('/user/profile');
+  return requestClient.get('/user/profile');
 }

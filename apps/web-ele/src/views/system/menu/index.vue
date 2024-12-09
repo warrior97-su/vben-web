@@ -142,7 +142,7 @@ onMounted(() => {
       </template>
 
       <ElTable :data="menuList" border row-key="id" style="width: 100%">
-        <ElTableColumn label="菜单名称" prop="name" />
+        <ElTableColumn label="菜单名称" prop="title" />
         <ElTableColumn label="图标" prop="icon">
           <template #default="{ row }">
             <ElIcon v-if="row.icon">
@@ -184,7 +184,7 @@ onMounted(() => {
           <ElTreeSelect
             v-model="menuForm.pid"
             :data="menuOptions"
-            :props="{ label: 'name', value: 'id' }"
+            :props="{ label: 'title', value: 'id' }"
             check-strictly
             clearable
             placeholder="选择上级菜单"

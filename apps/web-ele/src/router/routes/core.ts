@@ -35,6 +35,10 @@ const coreRoutes: RouteRecordRaw[] = [
       hideInTab: true,
       title: 'Authentication',
     },
+    props: {
+      pageTitle: '您的图书馆',
+      pageDescription: '欢迎使用图书馆管理系统',
+    },
     name: 'Authentication',
     path: '/auth',
     redirect: LOGIN_PATH,

@@ -110,41 +110,4 @@ function createRequestClient(baseURL: string) {
 
 export const requestClient = createRequestClient(apiURL);
 
-function createSpringBootRequestClient(baseURL: string) {
-  const client = new RequestClient({
-    baseURL,
-  });
-
-  function formatToken(token: null | string) {
-    return token ? `Bearer ${token}` : null;
-  }
-
-  // 请求头处理
-  client.addRequestInterceptor({
-    fulfilled: async (config) => {
-      const accessStore = useAccessStore();
-
-      config.headers.Authorization = formatToken(accessStore.accessToken);
-      config.headers['Accept-Language'] = preferences.app.locale;
-      return config;
-    },
-  });
-
-  client.addResponseInterceptor<HttpResponse>({
-    fulfilled: (response) => {
-      const { data: responseData, status } = response;
-      const { code, data } = responseData;
-      if (status >= 200 && status < 400 && code === '0') {
-        return data;
-      }
-      throw Object.assign({}, response, { response });
-    },
-  });
-  return client;
-}
-
 export const baseRequestClient = new RequestClient({ baseURL: apiURL });
-
-export const springBootRequestClient = createSpringBootRequestClient(
-  'http://49.234.181.38:9090',
-);

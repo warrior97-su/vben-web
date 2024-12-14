@@ -1,4 +1,4 @@
-import { springBootRequestClient } from '#/api/request';
+import { requestClient } from '#/api/request';
 
 export interface BookForm {
   id?: number;
@@ -23,7 +23,7 @@ export interface BookQuery {
 export const bookApi = {
   // 获取图书列表
   getBookList(params: BookQuery) {
-    return springBootRequestClient.get<{
+    return requestClient.get<{
       current: number;
       records: BookForm[];
       size: number;
@@ -33,16 +33,16 @@ export const bookApi = {
 
   // 添加图书
   addBook(data: Omit<BookForm, 'borrownum' | 'createTime' | 'id'>) {
-    return springBootRequestClient.post('/book', data);
+    return requestClient.post('/book', data);
   },
 
   // 更新图书
   updateBook(data: BookForm) {
-    return springBootRequestClient.put('/book', data);
+    return requestClient.put('/book', data);
   },
 
   // 删除图书
   deleteBook(id: number) {
-    return springBootRequestClient.delete(`/book/${id}`);
+    return requestClient.delete(`/book/${id}`);
   },
 };

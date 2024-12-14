@@ -65,7 +65,7 @@ const loadData = async () => {
     const data = await bookApi.getBookList({
       pageNum: currentPage.value,
       pageSize: pageSize.value,
-      search1: searchForm.name,
+      search2: searchForm.name,
     });
     tableData.value = data.records;
     total.value = data.total;
@@ -166,9 +166,6 @@ loadData();
         <ElForm :inline="true" :model="searchForm" class="flex-1">
           <ElFormItem label="书名">
             <ElInput v-model="searchForm.name" placeholder="请输入书名" />
-          </ElFormItem>
-          <ElFormItem label="作者">
-            <ElInput v-model="searchForm.author" placeholder="请输入作者" />
           </ElFormItem>
           <ElFormItem>
             <ElButton type="primary" @click="handleSearch">搜索</ElButton>

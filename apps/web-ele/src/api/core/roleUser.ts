@@ -1,4 +1,4 @@
-import { springBootRequestClient } from '#/api/request';
+import { requestClient } from '#/api/request';
 
 /**
  * 获取角色下的用户列表
@@ -13,7 +13,7 @@ export async function getRoleUsersApi(
     username?: string;
   },
 ) {
-  return springBootRequestClient.get(`/api/role-user/role/${roleId}`, {
+  return requestClient.get(`/api/role-user/role/${roleId}`, {
     params,
   });
 }
@@ -24,7 +24,7 @@ export async function getRoleUsersApi(
  * @param userIds 用户ID数组
  */
 export async function assignUsersToRoleApi(roleId: number, userIds: number[]) {
-  return springBootRequestClient.post(`/api/role-user/assign/${roleId}`, {
+  return requestClient.post(`/api/role-user/assign/${roleId}`, {
     userIds,
   });
 }
@@ -38,7 +38,7 @@ export async function removeUsersFromRoleApi(
   roleId: number,
   userIds: number[],
 ) {
-  return springBootRequestClient.delete(`/api/role-user/remove/${roleId}`, {
+  return requestClient.delete(`/api/role-user/remove/${roleId}`, {
     data: { userIds },
   });
 }
@@ -48,7 +48,7 @@ export async function removeUsersFromRoleApi(
  * @param userId 用户ID
  */
 export async function getUserRolesApi(userId: number) {
-  return springBootRequestClient.get(`/api/role-user/user/${userId}`);
+  return requestClient.get(`/api/role-user/user/${userId}`);
 }
 
 /**
@@ -57,8 +57,5 @@ export async function getUserRolesApi(userId: number) {
  * @param roleIds 角色ID数组
  */
 export async function assignRolesToUserApi(userId: number, roleIds: number[]) {
-  return springBootRequestClient.post(
-    `/api/role-user/assign/${userId}`,
-    roleIds,
-  );
+  return requestClient.post(`/api/role-user/assign/${userId}`, roleIds);
 }

@@ -7,9 +7,9 @@
 
 ## 预览
 
-- [Preview](http://vben.chengazhen.me/)
+- <a href="http://vben.chengazhen.me/" target="_blank">Preview</a>
 
-- [api文档](http://49.234.181.38:9090/swagger-ui/index.html)
+- <a href="http://49.234.181.38:9090/swagger-ui/index.html" target="_blank">api文档</a>
 
 ## 简介
 
@@ -88,7 +88,7 @@ pnpm build
 
 ## 维护者
 
-[@YourName](您的GitHub地址)
+[@chengazhen](https://github.com/chengazhen)
 
 ## 开源协议
 

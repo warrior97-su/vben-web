@@ -9,6 +9,10 @@
 
 - <a href="http://vben.chengazhen.me/" target="_blank">Preview</a>
 
+账号：admin
+
+密码：1234567
+
 - <a href="http://49.234.181.38:9090/swagger-ui/index.html" target="_blank">api文档</a>
 
 ## 简介

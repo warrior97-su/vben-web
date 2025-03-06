@@ -140,7 +140,7 @@ catalog:
   sass: 1.80.6
   sortablejs: ^1.15.4
   stylelint: ^16.10.0
-  stylelint-config-recess-order: ^5.1.1
+  stylelint-config-recess-order: ^6.0.0
   stylelint-config-recommended: ^14.0.1
   stylelint-config-recommended-scss: ^14.1.0
   stylelint-config-recommended-vue: ^1.5.0

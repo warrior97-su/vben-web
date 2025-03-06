@@ -90,10 +90,6 @@ pnpm build
 | :-: | :-: | :-: | :-: |
 | last 2 versions | last 2 versions | last 2 versions | last 2 versions |
 
-## 维护者
-
-[@chengazhen](https://github.com/chengazhen)
-
 ## 开源协议
 
 [MIT © Vben-2020](./LICENSE)

@@ -74,11 +74,11 @@ pnpm build
 
 ## 项目地址
 
-- [前端项目](https://github.com/chengazhen/springboot-vben)
+- [前端项目](https://github.com/warrior97-su/vben-web)
 
 ## 后端地址
 
-- [后端项目](https://github.com/chengazhen/Vue-Springboot-Library)
+- [后端项目](https://github.com/warrior97-su/vben-admin)
 
 ## 浏览器支持
 
